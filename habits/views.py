@@ -4,7 +4,7 @@ from habits.models import Habit, RelatedHabit
 from habits.paginators import HabitPaginator
 from habits.permissions import IsOwner
 from habits.serializers import HabitSerializer, RelatedHabitSerializer
-
+from datetime import timedelta
 
 class HabitCreateAPIView(generics.CreateAPIView):
     serializer_class = HabitSerializer
@@ -35,7 +35,7 @@ class PublicHabitListAPIView(generics.ListAPIView):
     pagination_class = HabitPaginator
 
     def get_queryset(self):
-        queryset = Habit.objects.filter(is_published=True)
+        queryset = Habit.objects.filter(is_public=True)
         return queryset
 
 

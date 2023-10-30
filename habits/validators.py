@@ -25,13 +25,17 @@ class HabitTypeValidator:
     def __init__(self, related_habit, reward, is_pleasant):
         self.related_habit = related_habit
         self.reward = reward
-        self.is_pleasant = bool(is_pleasant)
+        self.is_pleasant = is_pleasant
 
-    def __call__(self):
-        if self.related_habit is not None and self.reward is not None:
+    def __call__(self, value):
+        related_habit_ = dict(value).get(self.related_habit)
+        reward_ = dict(value).get(self.reward)
+        is_pleasant_ = dict(value).get(self.is_pleasant)
+
+        if related_habit_ is not None and reward_ is not None:
             raise ValidationError('You can either indicate a related habit or specify a reward')
 
-        if self.is_pleasant:
-            if self.related_habit is not None or self.reward is not None:
+        if is_pleasant_:
+            if related_habit_ is not None or reward_ is not None:
                 raise ValidationError('You cannot set a related (which is a pleasant habit as well)'
                                       ' habit or reward for a pleasant habit')

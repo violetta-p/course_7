@@ -27,15 +27,16 @@ class HabitTestCase(APITestCase):
             location='work',
             time='14:00',
             action='drink water',
+            reward=None,
             is_pleasant=True,
-            frequency='4 hours',
-            duration='60 seconds',
+            frequency='5 hours',
+            duration='80 seconds',
             is_public=True
         )
         cls.related_habit = RelatedHabit.objects.create(
             location='work',
             action='drink coffee',
-            duration='80 seconds',
+            duration='90 seconds',
             is_public=True
         )
 
@@ -49,7 +50,15 @@ class HabitTestCase(APITestCase):
             status.HTTP_200_OK
         )
 
-        print(response.json())
+    def test_get_public_habit_list(self):
+
+        response = self.client.get(
+            reverse('habits:public_habit_list')
+        )
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK
+        )
 
     def test_update_habit(self):
         data2 = {
@@ -57,15 +66,109 @@ class HabitTestCase(APITestCase):
             'time': '14:00',
             'action': 'drink hot water',
             'is_pleasant': True,
-            'frequency': '5 hours',
-            'duration': '70 seconds',
-            'is_public': False
+            'frequency': datetime.timedelta(seconds=600),
+            'duration': datetime.timedelta(seconds=70),
+            'is_public': False,
         }
-        response = self.client.put(
+
+        response = self.client.patch(
             reverse('habits:habit_update', kwargs={'pk': self.habit.pk}),
             data=data2,
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_fail_update_habit(self):
+        data2 = {
+            'location': 'home',
+            'time': '14:00',
+            'action': 'drink hot water',
+            'is_pleasant': True,
+            'frequency': datetime.timedelta(seconds=600),
+            'duration': datetime.timedelta(seconds=130),
+            'is_public': False,
+        }
+
+        response = self.client.patch(
+            reverse('habits:habit_update', kwargs={'pk': self.habit.pk}),
+            data=data2,
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_fail_2_update_habit(self):
+        data2 = {
+            'location': 'home',
+            'time': '14:00',
+            'action': 'drink hot water',
+            'is_pleasant': True,
+            'frequency': datetime.timedelta(hours=170),
+            'duration': datetime.timedelta(seconds=130),
+            'is_public': False,
+        }
+
+        response = self.client.patch(
+            reverse('habits:habit_update', kwargs={'pk': self.habit.pk}),
+            data=data2,
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_fail_3_update_habit(self):
+        data2 = {
+            'location': 'home',
+            'time': '14:00',
+            'action': 'drink hot water',
+            'is_pleasant': True,
+            'reward': 'eat',
+            'frequency': datetime.timedelta(hours=100),
+            'duration': datetime.timedelta(seconds=100),
+            'is_public': False,
+        }
+
+        response = self.client.patch(
+            reverse('habits:habit_update', kwargs={'pk': self.habit.pk}),
+            data=data2,
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_fail_4_update_habit(self):
+        data2 = {
+            'location': 'home',
+            'time': '14:00',
+            'action': 'drink hot water',
+            'is_pleasant': True,
+            'related_habit': self.related_habit,
+            'frequency': datetime.timedelta(hours=100),
+            'duration': datetime.timedelta(seconds=100),
+            'is_public': False,
+        }
+
+        response = self.client.patch(
+            reverse('habits:habit_update', kwargs={'pk': self.habit.pk}),
+            data=data2,
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_habit(self):
+        self.client.force_authenticate(user=self.user)
+        data = {
+            'location': 'home',
+            'time': '14:00',
+            'action': 'drink hot water',
+            'is_pleasant': True,
+            'frequency': datetime.timedelta(hours=100),
+            'duration': datetime.timedelta(seconds=100),
+            'is_public': False,
+        }
+
+        response = self.client.post(
+            reverse('habits:habit_create'),
+            data=data
+
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_201_CREATED
+        )
 
     def test_delete_habit(self):
         response = self.client.delete(
@@ -91,11 +194,26 @@ class RelatedHabitTestCase(APITestCase):
             is_public=True
         )
 
+    def test_create_related_habit(self):
+        self.client.force_authenticate(user=self.user)
+        data = {
+            'location': 'home',
+            'action': 'drink hot water',
+            'duration': datetime.timedelta(seconds=100),
+            'is_public': False,
+        }
+
+        response = self.client.post(
+            reverse('habits:habit_related_create'),
+            data=data
+
+        )
+
     def test_update_related_habit(self):
         data2 = {
             'location': 'home',
             'action': 'drink hot water',
-            'duration': '70 seconds',
+            'duration': datetime.timedelta(seconds=70),
             'is_public': False
         }
         response = self.client.put(
