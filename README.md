@@ -40,7 +40,7 @@ CSRF_TRUSTED_ORIGINS = [
 
 ## Запуск проекта
 * Склонировать репозиторий в IDE: 
-   В терминале ввести команду: git clone https://github.com/toir02/TaskTracker
+   В терминале ввести команду: git clone https://github.com/violetta-p/course_7
 
 * Установить виртуальное окружение и зависимости из файла requirements.txt:
 
