@@ -1,8 +1,8 @@
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
 
 from habits.models import Habit, RelatedHabit
-from habits.validators import DurationValidator, HabitTypeValidator, FrequencyValidator
+from habits.validators import DurationValidator, \
+    HabitTypeValidator, FrequencyValidator
 
 
 class HabitSerializer(serializers.ModelSerializer):
@@ -11,7 +11,9 @@ class HabitSerializer(serializers.ModelSerializer):
         fields = '__all__'
         validators = [DurationValidator(duration='duration'),
                       FrequencyValidator(frequency='frequency'),
-                      HabitTypeValidator(related_habit='related_habit', reward='reward', is_pleasant='is_pleasant'),
+                      HabitTypeValidator(related_habit='related_habit',
+                                         reward='reward',
+                                         is_pleasant='is_pleasant'),
                       ]
 
 

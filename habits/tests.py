@@ -1,9 +1,7 @@
-import json
-import os
 import datetime
 
 from rest_framework import status
-from rest_framework.test import APITestCase, APIClient, force_authenticate
+from rest_framework.test import APITestCase
 from django.urls import reverse
 
 from habits.models import Habit, RelatedHabit
@@ -206,7 +204,10 @@ class RelatedHabitTestCase(APITestCase):
         response = self.client.post(
             reverse('habits:habit_related_create'),
             data=data
-
+        )
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_201_CREATED
         )
 
     def test_update_related_habit(self):
@@ -217,12 +218,15 @@ class RelatedHabitTestCase(APITestCase):
             'is_public': False
         }
         response = self.client.put(
-            reverse('habits:habit_related_update', kwargs={'pk': self.related_habit.pk}),
+            reverse('habits:habit_related_update',
+                    kwargs={'pk': self.related_habit.pk}),
             data=data2,
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_delete_habit(self):
         response = self.client.delete(
-            reverse('habits:habit_related_delete', kwargs={'pk': self.related_habit.pk}))
+            reverse(
+                'habits:habit_related_delete',
+                kwargs={'pk': self.related_habit.pk}))
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)

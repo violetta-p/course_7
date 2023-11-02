@@ -98,7 +98,6 @@ DATABASES = {
 }
 
 
-
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
@@ -187,7 +186,7 @@ CELERY_TASK_TIME_LIMIT = 30 * 60
 
 CELERY_BEAT_SCHEDULE = {
     'task-name': {
-        'task': 'users.tasks.deactivate_user',
+        'task': 'habits.tasks.send_message',
         'schedule': timedelta(minutes=30),
     },
 }

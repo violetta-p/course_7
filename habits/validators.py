@@ -33,9 +33,11 @@ class HabitTypeValidator:
         is_pleasant_ = dict(value).get(self.is_pleasant)
 
         if related_habit_ is not None and reward_ is not None:
-            raise ValidationError('You can either indicate a related habit or specify a reward')
+            raise ValidationError('You can either indicate a related habit '
+                                  'or specify a reward')
 
         if is_pleasant_:
             if related_habit_ is not None or reward_ is not None:
-                raise ValidationError('You cannot set a related (which is a pleasant habit as well)'
+                raise ValidationError('You cannot set a related '
+                                      '(pleasant habit as well)'
                                       ' habit or reward for a pleasant habit')
